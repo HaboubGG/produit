@@ -2,17 +2,34 @@ package com.iset.produit.entities;
 
 
 
+import groovy.transform.ToString;
+import groovyjarjarantlr4.v4.runtime.misc.NotNull;
+import org.springframework.format.annotation.DateTimeFormat;
+
 import javax.persistence.*;
+import javax.validation.constraints.Max;
+import javax.validation.constraints.Min;
+import javax.validation.constraints.PastOrPresent;
+import javax.validation.constraints.Size;
 import java.util.Date;
 
 @Entity
 public class Produit {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue (strategy = GenerationType.IDENTITY)
     private Long idProduit;
+    @NotNull
+    @Size(min = 4,max = 15)
     private String nomProduit;
+    @Min(value = 10)
+    @Max(value = 10000)
     private Double prixProduit;
+    @Temporal(TemporalType.DATE)
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
+    @PastOrPresent
     private Date dateCreation;
+    @ManyToOne
+    private Categorie categorie;
 
     public Produit(String nomProduit, Double prixProduit, Date dateCreation) {
         this.nomProduit = nomProduit;
@@ -53,5 +70,16 @@ public class Produit {
 
     public void setDateCreation(Date dateCreation) {
         this.dateCreation = dateCreation;
+    }
+
+    @Override
+    public String toString() {
+        return "Produit{" +
+                "idProduit=" + idProduit +
+                ", nomProduit='" + nomProduit + '\'' +
+                ", prixProduit=" + prixProduit +
+                ", dateCreation=" + dateCreation +
+                ", categorie=" + categorie +
+                '}';
     }
 }

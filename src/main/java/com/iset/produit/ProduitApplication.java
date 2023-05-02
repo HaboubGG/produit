@@ -18,12 +18,7 @@ public class ProduitApplication implements CommandLineRunner {
     }
     @Override
     public void run(String... args) throws Exception {
-        // TODO Auto-generated method stub
-        Produit prod1 = new Produit("PC Asus",1500.500,new Date());
-        Produit prod2 = new Produit("PC Dell",2000.500,new Date());
-        Produit prod3 = new Produit("PC Toshiba",2500.500,new Date());
-        service.saveProduit(prod1);
-        service.saveProduit(prod2);
-        service.saveProduit(prod3);
+
     }
+
 }
