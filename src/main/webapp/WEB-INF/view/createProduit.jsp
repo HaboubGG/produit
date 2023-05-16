@@ -30,6 +30,15 @@
                 <label class="control-label">date création :</label>
                 <input type="date" name="date" class="form-control"/>
             </div>
+            <div class="form-group">
+                <select class="form-select"  name="CategorieId" required>
+                    <option th:each="categorie:${ CategorieList}"
+                            th:value="${driver.getId()}"
+                            th:text="'Driver ID :  ' + ${driver.getId()} + ' Name:  ' + ${driver.getLogin()}">
+                    </option>
+                </select>
+            </div>
+
             <div>
                 <button type="submit" class="btn btn-primary">Ajouter</button>
             </div>

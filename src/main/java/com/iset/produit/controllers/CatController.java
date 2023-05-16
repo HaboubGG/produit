@@ -6,6 +6,9 @@ import com.iset.produit.service.CategorieService;
 import com.iset.produit.service.ProduitService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.validation.BindingResult;
@@ -27,7 +30,12 @@ public class CatController {
     CategorieService categorieService;
     @RequestMapping("/showCreate")
     public String showCreate(ModelMap modelMap) {
+
         modelMap.addAttribute("produit", new Produit());
+        modelMap.addAttribute("categorie",new Categorie());
+        List<Categorie> CategorieList = categorieService.getAllCategories();
+        modelMap.addAttribute("CategorieList",CategorieList);
+
         return "createProduit";
     }
     /*
@@ -37,16 +45,20 @@ public class CatController {
     @RequestMapping("/saveProduit")
     public String saveProduit(@Valid Produit produit,
                               BindingResult bindingResult,
-                              ModelMap modelMap) {
+                              ModelMap modelMap,
+                              @RequestParam(name="categorieId") Long CategorieId
+    ) {
         if (bindingResult.hasErrors()) {
+            List<Categorie> CategorieList = categorieService.getAllCategories();
+            modelMap.addAttribute("CategorieList",CategorieList);
             return "createProduit";
         }
-        Produit saveProduit = produitService.saveProduit(produit);
-        String msg = "produit enregistré avec Id " +
-                saveProduit.getIdProduit();
+        Produit saveProduit = produitService.saveProduit(produit,CategorieId);
+        String msg = "produit enregistré avec Id " + saveProduit.getIdProduit();
         modelMap.addAttribute("msg", msg);
         return "createProduit";
     }
+
     @RequestMapping("/saveCategorie")
     public String saveCategorie(@Valid Categorie categorie,
                               BindingResult bindingResult,
@@ -60,6 +72,7 @@ public class CatController {
         modelMap.addAttribute("msg", msg);
         return "createCategorie";
     }
+
     @RequestMapping("/ListeCategories")
     public String listeCategories(
             ModelMap modelMap,
@@ -88,7 +101,32 @@ public class CatController {
         return "listeProduits";
     }
 
+    @RequestMapping("/filter")
+    public String FiltrerParNom( ModelMap modelMap,
+                                 @RequestParam(name="nom") String nom,
+                                 @RequestParam(name = "page", defaultValue = "0") int page,
+                                 @RequestParam(name = "size", defaultValue = "2") int size){
+//        List<Produit>  filtredProds = produitService.findByNomProduitContains(nom);
+//          Page<Produit> filtredProds = produitService.getAllProduitsParPage(page,size);
+       Page<Produit> filtredProds = produitService.searchProductsContainingName(nom, page, size);
+        if(filtredProds!=null)
+        {
+            modelMap.addAttribute("produits", filtredProds);
+            modelMap.addAttribute("pages", new int[filtredProds.getTotalPages()]);
+            modelMap.addAttribute("currentPage", page);
+            String msg = "Product found :";
+            modelMap.addAttribute("foundMessage", msg);
 
+        }
+        else{
+            Page<Produit> prods = produitService.getAllProduitsParPage(page, size);
+            modelMap.addAttribute("produits", prods);
+            modelMap.addAttribute("pages", new int[prods.getTotalPages()]);
+            modelMap.addAttribute("currentPage", page);
+            System.out.println("product with this name not found ");
+        }
+        return "listeProduits";
+    }
     @RequestMapping("/supprimerProduit")
     public String supprimerProduit(@RequestParam("id") Long id, ModelMap
             modelMap,
@@ -125,7 +163,9 @@ public class CatController {
     {
         Produit p= produitService.getProduit(id);
         modelMap.addAttribute("produit", p);
-        return "createProduit";
+        List<Categorie> CategorieList = categorieService.getAllCategories();
+        modelMap.addAttribute("CategorieList",CategorieList);
+        return "editerProduit";
     }
 
     @RequestMapping("/modifierCategorie")
@@ -133,19 +173,24 @@ public class CatController {
     {
         Categorie c = categorieService.getCategorie(id);
         modelMap.addAttribute("categorie", c);
-        return "editerCategorie";
+        return "createCategorie";
     }
     @RequestMapping("/updateProduit")
     public String updateProduit(@ModelAttribute("produit") Produit produit,
-                                @RequestParam("date") String date,
-                                ModelMap modelMap) throws ParseException {
+                                @RequestParam("date") @DateTimeFormat(pattern="yyyy-MM-dd") Date dateCreation,
+                                ModelMap modelMap,
+                                @RequestParam(name="categorieId") Long id ,
+                                @RequestParam(name = "page", defaultValue = "0") int page,
+                                @RequestParam(name = "size", defaultValue = "2") int size) throws ParseException {
         //conversion de la date
-        SimpleDateFormat dateformat = new SimpleDateFormat("yyyy-MM-dd");
-        Date dateCreation = dateformat.parse(String.valueOf(date));
         produit.setDateCreation(dateCreation);
-        produitService.updateProduit(produit);
-        List<Produit> prods = produitService.getAllProduits();
+        produitService.updateProduit(produit , produit.getIdProduit() , id);
+        Page<Produit> prods = produitService.getAllProduitsParPage(page,
+                size);
         modelMap.addAttribute("produits", prods);
+        modelMap.addAttribute("pages", new int[prods.getTotalPages()]);
+        modelMap.addAttribute("currentPage", page);
+        modelMap.addAttribute("size", size);
         return "listeProduits";
     }
 
@@ -153,13 +198,15 @@ public class CatController {
     public String updateCategorie(@ModelAttribute("categorie") Categorie categorie,
                                 ModelMap modelMap,
                                   @RequestParam(name = "page", defaultValue = "0") int page,
-                                  @RequestParam(name = "size", defaultValue = "2") int size
+                                  @RequestParam(name = "size", defaultValue = "2") int size,
+                                  @RequestParam(name="idCat") Long id
     ) {
-        categorieService.updateCategorie(categorie ,categorie.getIdCat());
+        categorieService.updateCategorie(categorie ,id);
         Page<Categorie> Categories = categorieService.getAllCategoriesParPage(page, size);
         modelMap.addAttribute("categories", Categories);
         modelMap.addAttribute("pages", new int[Categories.getTotalPages()]);
         modelMap.addAttribute("currentPage", page);
         return "listeCategories";
     }
+
     }

@@ -28,6 +28,15 @@ public class Produit {
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     @PastOrPresent
     private Date dateCreation;
+
+    public Categorie getCategorie() {
+        return categorie;
+    }
+
+    public void setCategorie(Categorie categorie) {
+        this.categorie = categorie;
+    }
+
     @ManyToOne
     private Categorie categorie;
 

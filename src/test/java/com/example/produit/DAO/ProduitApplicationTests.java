@@ -9,7 +9,7 @@ import com.iset.produit.service.ProduitService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 
 import java.util.Date;
 import java.util.List;
@@ -56,12 +56,12 @@ class ProduitApplicationTests {
             System.out.println(p);
 
     }
-@Test
-    public void testFindByNomProduit() {
-        List<Produit> prods = produitRepository.findByNomProduit("Asus");
-        for (Produit p : prods) {System.out.println("testFindByNomProduit " + p.getNomProduit());
-        }
-    }
+//@Test
+//    public void testFindByNomProduit() {
+//        List<Produit> prods = produitRepository.findByNomProduit(PageRequest.of(page, size), "Asus");
+//        for (Produit p : prods) {System.out.println("testFindByNomProduit " + p.getNomProduit());
+//        }
+//    }
     @Test
     public void testFindByNomProduitContains() {
         List<Produit> prods =

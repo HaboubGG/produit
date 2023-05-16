@@ -1,11 +1,13 @@
 package com.iset.produit.service;
 
+import com.iset.produit.DAO.CategorieRepository;
 import com.iset.produit.DAO.ProduitRepository;
 import com.iset.produit.entities.Categorie;
 import com.iset.produit.entities.Produit;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -13,14 +15,24 @@ import java.util.List;
 public class ProduitServiceImpl implements ProduitService {
     @Autowired
     ProduitRepository produitRepository;
+    @Autowired
+    CategorieRepository categorieRepository;
 
     @Override
-    public Produit saveProduit(Produit p) {
-        return produitRepository.save(p);
+    public Produit saveProduit(Produit p , Long CategorieId) {
+     Categorie categorie =categorieRepository.findFirstByIdCat(CategorieId);
+       p.setCategorie(categorie);
+       return produitRepository.save(p);
     }
     @Override
-    public Produit updateProduit(Produit p) {
-        return produitRepository.save(p);
+    public Produit updateProduit(Produit p , long id , Long categorieId) {
+        Produit prod = produitRepository.findFirstByIdProduit(id);
+        Categorie cat = categorieRepository.findFirstByIdCat(categorieId);
+        prod.setCategorie(cat);
+        prod.setNomProduit(p.getNomProduit());
+        prod.setPrixProduit(p.getPrixProduit());
+        prod.setDateCreation(p.getDateCreation());
+        return produitRepository.save(prod);
     }
     @Override
     public void deleteProduit(Produit p) {
@@ -45,6 +57,7 @@ public class ProduitServiceImpl implements ProduitService {
         // TODO Auto-generated method stub
         return produitRepository.findAll(PageRequest.of(page, size));
     }
+
     @Override
     public List<Produit> findByNomProduit(String nom){
         List<Produit> prods = produitRepository.findByNomProduit(nom);
@@ -64,6 +77,9 @@ public class ProduitServiceImpl implements ProduitService {
         return prods;
 
     }
+
+
+
     @Override
     public List<Produit> findByCategorie (Categorie categorie){
         List<Produit> prods = produitRepository.findByCategorie(categorie);
@@ -88,5 +104,9 @@ public class ProduitServiceImpl implements ProduitService {
         return prods;
     }
 
+    public Page<Produit> searchProductsContainingName(String name, int pageNumber, int pageSize) {
+        Pageable pageable = PageRequest.of(pageNumber, pageSize);
+        return produitRepository.findByNomProduitContaining(name,pageable);
+    }
 
 }
