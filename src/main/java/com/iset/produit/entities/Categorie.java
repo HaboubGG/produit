@@ -26,6 +26,7 @@ public class Categorie {
         this.descriptionCat = descriptionCat;
         this.produits = produits;
     }
+    //hello
     public Long getIdCat() {
         return idCat;
     }
