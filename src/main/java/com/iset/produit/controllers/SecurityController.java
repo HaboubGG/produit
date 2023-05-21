@@ -1,6 +1,8 @@
 package com.iset.produit.controllers;
 
+import com.iset.produit.entities.Produit;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 
@@ -24,6 +26,13 @@ public class SecurityController {
     {
         return "login";
     }
+    @GetMapping("/signup")
+    public String signup(ModelMap modelMap)
+    {
+        modelMap.addAttribute("user", new UserForm());
+        return"login";
+    }
+
     @GetMapping("/logout")
     public String logout(HttpServletRequest request) throws ServletException
     {

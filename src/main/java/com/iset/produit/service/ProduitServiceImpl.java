@@ -103,7 +103,6 @@ public class ProduitServiceImpl implements ProduitService {
         List<Produit> prods = produitRepository.trierProduitsNomsPrix();
         return prods;
     }
-
     public Page<Produit> searchProductsContainingName(String name, int pageNumber, int pageSize) {
         Pageable pageable = PageRequest.of(pageNumber, pageSize);
         return produitRepository.findByNomProduitContaining(name,pageable);

@@ -11,6 +11,7 @@ public class UserForm {
         this.confirmedPassword = confirmedPassword;
     }
 
+    public UserForm(){}
     public String getUsername() {
         return username;
     }
