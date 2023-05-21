@@ -139,7 +139,7 @@ public class CatController {
         modelMap.addAttribute("pages", new int[prods.getTotalPages()]);
         modelMap.addAttribute("currentPage", page);
         modelMap.addAttribute("size", size);
-        return "listeProduits";
+       return "listeProduits";
     }
     @RequestMapping("/supprimerCategorie")
     public String supprimerCategorie(@RequestParam("id") Long id, ModelMap
